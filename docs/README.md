@@ -1,7 +1,7 @@
 # Zig-learning-docs-to-server-programmer
   
 - [ZigLang 한글 공식 사이트](https://ziglang.org/ko )
-    - [배우기](https://ziglang.org/ko/learn/ ) 
+    - [배우기](https://ziglang.org/ko/learn/ )  | [(일어) 배우기](https://ziglang.org/ja/learn/overview ) 
     - [시작하기](https://ziglang.org/ko/learn/getting-started/ )
     - [Zig Language Reference](https://ziglang.org/documentation/master/ ) [한국어](https://runebook.dev/ko/docs/zig/-index- )
     - [STD](https://ziglang.org/documentation/master/std/#root )
@@ -10,6 +10,7 @@
 - [Zig 첫인상](https://velog.io/@maxtnuk/Zig-%EC%B2%AB%EC%9D%B8%EC%83%81 ) 
 - [(일어) Zig 언어의 문서를 보고 "과연" 이라고 생각한 부분](https://zenn.dev/tetsu_koba/articles/032d3a2f675f50 )
 - [JetBrains Plugin - Zig Support](https://plugins.jetbrains.com/plugin/18062-zig-support/versions )
+- [(일어) Zig 문서 0.10.1](https://gist.github.com/voluntas/6febea855571bbe19901f0f096245adc )
   
   
 # 설치
@@ -205,4 +206,7 @@ const d3: [*]const u8 = d + 1;
     
 ## 네트워크  
 - [pike](https://github.com/lithdew/pike ). 비동기 I/O 라이브러리    
-- [natsmq](https://github.com/nats-io/nats.zig )
+- [nats.zig](https://github.com/ianic/nats.zig )
+  
+## DB
+- [zig-okredis](https://github.com/kristoff-it/zig-okredis )  Redis 라이브러리  
