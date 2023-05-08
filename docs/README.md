@@ -19,6 +19,9 @@
   
     
 # 학습
+- [기초](.\01_basic.md)  
+
+### 참고  
 - https://ziglearn.org/chapter-1/
 - https://ziglang.org/documentation/0.9.1/
 - [(일어) Zig에서 Hello World](https://qiita.com/PenguinCabinet/items/46184806f3410e37d6a7 )
@@ -30,8 +33,9 @@
 - [(일어) Zig 표준 라이브러리에서 준비되어 있는 컬렉션 타입을 정리](https://zenn.dev/magurotuna/articles/zig-std-collections )
   
   
-  
-# VSCode
+# IDE
+    
+## VSCode
 - [VSCode - Zig](https://marketplace.visualstudio.com/items?itemName=prime31.zig)
 - [Debugging Zig with VS Code](https://dev.to/watzon/debugging-zig-with-vs-code-44ca )
 - [Windows용 VS Code에서 Zig 코드 디버그](https://zhuanlan.zhihu.com/p/463740524 )
@@ -48,11 +52,7 @@
 - [(일어) zig으로 OpenGL 그리고 wasm](https://qiita.com/ousttrue/items/4802b61ba340dd7d89f3 )
     
     
-# 네트워크 프로그래밍
-- [(일어) Zig로 UDP 통신을 하는 샘플 프로그램](https://zenn.dev/tetsu_koba/articles/4840401763bed3 )
-- [(일어) Zig로 TCP 통신을 하는 샘플 프로그램](https://zenn.dev/tetsu_koba/articles/ed68ef22d2af4c )
-- [(일어) Zig로 Linux의 epoll과 signalfd 시스템 콜을 사용하는 샘플 프로그램](https://zenn.dev/tetsu_koba/articles/7fb5e7d13479ba )
-  
+# [네트워크 프로그래밍](.\network_programming.md)
 
   
 # Build 
@@ -64,14 +64,4 @@
 
   
   
-# 라이브러리
-- [Awesome Zig](https://github.com/nrdmn/awesome-zig )  
-- [(일어) Zig의 TensorFlow Lite 라이브러리를 만들었다](https://zenn.dev/mattn/articles/af64c6a3eefad0 )
-- [(일어) Zig의 OpenCV 라이브러리 「zigcv」을 만들고 있다](https://zenn.dev/ryoppippi/articles/a368496c19a160 )
-    
-## 네트워크  
-- [pike](https://github.com/lithdew/pike ). 비동기 I/O 라이브러리    
-- [nats.zig](https://github.com/ianic/nats.zig )
-  
-## DB
-- [zig-okredis](https://github.com/kristoff-it/zig-okredis )  Redis 라이브러리  
+# [라이브러리](.\libs.md)
