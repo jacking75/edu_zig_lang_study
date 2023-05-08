@@ -21,16 +21,22 @@
 # 학습
 - [기초](.\01_basic.md)  
 
-### 참고  
+## 참고  
 - https://ziglearn.org/chapter-1/
 - https://ziglang.org/documentation/0.9.1/
-- [(일어) Zig에서 Hello World](https://qiita.com/PenguinCabinet/items/46184806f3410e37d6a7 )
 - [(일어) Zig에 대해서](https://zenn.dev/hnakamur/books/memo-about-zig )
 - [(일어) 대략적으로 Zig 소개](https://zenn.dev/hastur/articles/bacbe2af2c5807)
 - [(일어) 문법 정리](https://qiita.com/bellbind/items/f2338fa1d82a2a79f290 )
 - [exercises](https://github.com/ratfactor/ziglings/tree/main/exercises )
 - [(일어) Zig 언어의 산술연산자](https://zenn.dev/yohhoy/articles/zig-exotic-arithops )  
 - [(일어) Zig 표준 라이브러리에서 준비되어 있는 컬렉션 타입을 정리](https://zenn.dev/magurotuna/articles/zig-std-collections )
+- https://zenn.dev/tetsu_koba/articles/c039b865114b93
+- https://gist.github.com/voluntas/6febea855571bbe19901f0f096245adc?utm_source=pocket_reader
+- 5分でざっと理解するZig言語  https://zenn.dev/tetsu_koba/articles/2da58bd66586aa
+- 「C言語であった問題をとにかく解決する」を目標に掲げるZig言語  https://logmi.jp/tech/articles/328160 
+- https://ziglang.org/ja/learn/overview/
+- https://gist.github.com/voluntas/6febea855571bbe19901f0f096245adc 
+- Zig 기사  https://atmarkit.itmedia.co.jp/ait/articles/2304/13/news044.html
   
   
 # IDE
