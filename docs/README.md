@@ -9,15 +9,41 @@
 - [GitHub](https://github.com/ziglang/zig )
 - [Zig 첫인상](https://velog.io/@maxtnuk/Zig-%EC%B2%AB%EC%9D%B8%EC%83%81 ) 
 - [(일어) Zig 언어의 문서를 보고 "과연" 이라고 생각한 부분](https://zenn.dev/tetsu_koba/articles/032d3a2f675f50 )
-- [JetBrains Plugin - Zig Support](https://plugins.jetbrains.com/plugin/18062-zig-support/versions )
 - [(일어) Zig 문서 0.10.1](https://gist.github.com/voluntas/6febea855571bbe19901f0f096245adc )
   
   
+# 특징
+- 헤더 파일이 없다. 전처리기도 없다. 예외도 없다. 가비지 컬렉터는 없다.
+- 객체 지향이 아니다.
+- C++의 소멸자 같은 것은 없다. Golang 처럼 defer에서 리소스를 해제한다.
+- defer, errdefer, 라벨 붙은 block 도입에 의해 goto가 불필요하다.
+- 컴파일시 한정(comptime)으로, 타입으로 연산할 수 있다. 즉 제네릭스와 같은 효과.
+- 코딩 실수를 미연에 방지하는 기능이 많이 있다. (오버 플로우를 검출하는 연산자 등)
+- 소스 코드의 포맷 툴이 처음부터 있다.
+- 크로스 컴파일이 간단. (백엔드가 LLVM) wasm도 출력할 수 있다.
+- **C 언어와의 상호 운용이 쉽다. (C ABI 라이브러리를 호출 할 수 있고, C ABI 라이브러리를 만들 수 있음)**
+- 언어 사양과 표준 라이브러리가 명확하게 분리되어 있다. free standing(=베어 메탈 환경) 대응 가능.
+- Zig을 C 컴파일러, C++ 컴파일러로도 사용할 수 있다.
+- 빌드 툴을 포함하고 있으므로, make나 cmake 커멘드가 불필요.
+- C 소스 코드를 Zig로 자동 변환하는 도구가 있다. (모든 것이 자동 변환 할 수있는 것은 아니지만 마이그레이션에 도움이 된다)
+- Zig는 Zig 자체적으로 기술된다. (self-hosted)  
+  
+
+# 약점
+- (2023.05)아직 공식 릴리즈가 아니므로 파괴적 변경이 들어갈 수 있음
+- 표준 라이브러리가 여전히 부족. (부족한 것은 스스로 만들거나 C 라이브러리를 사용한다)
+- 공식 패키지 매니저가 아직 없다(만들고 있는 중)
+- 컴파일 오류 메시지가 사람에게 친숙하지 않을 때가 있다(완전히 컴파일러 시선)
+  
+<br>  
+  
+
 # 설치
 - [Zig 언어를 Ubuntu(WSL2)에 설치](https://docs.google.com/document/d/e/2PACX-1vSK1VpNBg9P-I1Fvr0LuBlxKAuMtYeH0We7n-jAUqq4x9YDQhS3i0kSVE2O2T0bV01mLmCcZK5m74hX/pub ) 
     
-  
-    
+<br>    
+     
+
 # 학습
 - [기초](.\01_basic.md)  
 
@@ -30,15 +56,12 @@
 - [exercises](https://github.com/ratfactor/ziglings/tree/main/exercises )
 - [(일어) Zig 언어의 산술연산자](https://zenn.dev/yohhoy/articles/zig-exotic-arithops )  
 - [(일어) Zig 표준 라이브러리에서 준비되어 있는 컬렉션 타입을 정리](https://zenn.dev/magurotuna/articles/zig-std-collections )
-- https://zenn.dev/tetsu_koba/articles/c039b865114b93
-- https://gist.github.com/voluntas/6febea855571bbe19901f0f096245adc?utm_source=pocket_reader
-- 5分でざっと理解するZig言語  https://zenn.dev/tetsu_koba/articles/2da58bd66586aa
 - 「C言語であった問題をとにかく解決する」を目標に掲げるZig言語  https://logmi.jp/tech/articles/328160 
-- https://ziglang.org/ja/learn/overview/
-- https://gist.github.com/voluntas/6febea855571bbe19901f0f096245adc 
-- Zig 기사  https://atmarkit.itmedia.co.jp/ait/articles/2304/13/news044.html
+- Zigからlibcのライブラリを呼び出してUNIX時間を文字列表現に変換する  https://zenn.dev/tetsu_koba/articles/262ef6d8539f2e
   
-  
+<br>  
+
+
 # IDE
     
 ## VSCode
@@ -46,8 +69,12 @@
 - [Debugging Zig with VS Code](https://dev.to/watzon/debugging-zig-with-vs-code-44ca )
 - [Windows용 VS Code에서 Zig 코드 디버그](https://zhuanlan.zhihu.com/p/463740524 )
   
+## JetBrains
+- [JetBrains Plugin - Zig Support](https://plugins.jetbrains.com/plugin/18062-zig-support/versions )
+
+<br>    
   
-  
+    
 # 응용 
 - [(일어) Zig으로 쓴 cmd 애플리케이션에 perf 사용하기](https://zenn.dev/hnakamur/articles/use-perf-to-cli-app-written-in-zig )
 - [(일어) Zig에서 출력을 버퍼링하기](https://zenn.dev/woxtu/articles/output-buffering-in-zig )
