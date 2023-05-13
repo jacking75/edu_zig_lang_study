@@ -46,14 +46,14 @@
 # 학습
 - [Zig 명령어](https://docs.google.com/document/d/e/2PACX-1vRqzUjWtvFSU0hJoHyb9g1B6cD3ZN80ZEw5ftZZM8LQUzkty_6kRZIST0tYVDxfHnW1P1Q25FbGQTCa/pub )
 - [기초](.\01_basic.md)  
+- [표준 라이브러리의 컬렉션](.\02_std-collectios.md)
+- [exercises](https://github.com/ratfactor/ziglings/tree/main/exercises )
 
 ## 참고  
 - https://ziglearn.org/chapter-1/
 - https://ziglang.org/documentation/0.9.1/
 - [(일어) Zig에 대해서](https://zenn.dev/hnakamur/books/memo-about-zig )
 
-- [exercises](https://github.com/ratfactor/ziglings/tree/main/exercises )
-- [(일어) Zig 언어의 산술연산자](https://zenn.dev/yohhoy/articles/zig-exotic-arithops )  
 - [(일어) Zig 표준 라이브러리에서 준비되어 있는 컬렉션 타입을 정리](https://zenn.dev/magurotuna/articles/zig-std-collections )
 
   
