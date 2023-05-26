@@ -136,16 +136,46 @@ test "SegmentedList" {
 }
 ```  
   
-SinglyLinkedList
-단방향 연결 목록입니다. C++에 std::forward_list해당합니다.
-요소의 메모리, 수명 관리는 호출자의 책임입니다.
+# SinglyLinkedList
+단방향 연결 리스트이다. C++의 `std::forward_list` 에 해당한다.
+요소의 메모리, 수명 관리는 호출자 책임이다.  
 
-샘플 코드
-TailQueue
-양방향 연결 목록입니다. C++의 std::listRust에 std::collections::LinkedList해당합니다.
-요소의 메모리, 수명 관리는 호출자의 책임입니다.
+샘플 코드  
+```
+test "SinglyLinkedList" {
+    const L = SinglyLinkedList(u32);
+    var list = L{};
 
-샘플 코드
+    try testing.expectEqual(@as(usize, 0), list.len());
+
+    var one = L.Node{ .data = 1 };
+    var two = L.Node{ .data = 2 };
+
+    list.prepend(&two);
+    list.prepend(&one);
+
+    {
+        var it = list.first;
+        var val: u32 = 1;
+        while (it) |node| : (it = node.next) {
+            try testing.expectEqual(val, node.data);
+            val += 1;
+        }
+    }
+
+    try testing.expectEqual(@as(usize, 2), list.len());
+    try testing.expectEqual(@as(u32, 1), list.first.?.data);
+    try testing.expectEqual(@as(u32, 1), list.popFirst().?.data);
+}
+```
+  
+
+# TailQueue
+양방향 연결 리스트이다. C++의 `std::list`, Rust의 `std::collections::LinkedList` 에 해당한다.  
+요소의 메모리, 수명 관리는 호출자 책임이다.  
+  
+샘플 코드  
+```
 test "TailQueue" {
     const L = TailQueue(u32);
     var list = L{};
@@ -161,7 +191,7 @@ test "TailQueue" {
     list.prepend(&one);
     try testing.expectEqual(@as(usize, 3), list.len);
 
-    // 順方向イテレート
+    // 순방향 이터레이터
     {
         var it = list.first;
         var val: u32 = 1;
@@ -171,7 +201,7 @@ test "TailQueue" {
         }
     }
 
-    // 逆方向イテレート
+    // 역방향 이터레이터
     {
         var it = list.last;
         var val: u32 = 3;
@@ -181,32 +211,105 @@ test "TailQueue" {
         }
     }
 }
+```  
+  
+   
 
-HashMap
-소위 연상 배열입니다. C++ std::unordered_map, Rust에 std::collections::HashMap해당합니다.
-기본적으로는 AutoHashMapAuto라는 prefix가 붙은 것을 사용하게 된다고 생각합니다. 여기는 해시 함수나 키의 동치 판정을 실시하는 함수를 잘 생성해 줍니다.
-반대로, 해시 함수나 키의 동치 판정을 커스터마이즈 하고 싶은 경우는, HashMap를 사용합니다.
+# HashMap
+소위 연상 배열이다. C++의 `std::unordered_map`, Rust의 `std::collections::HashMap`에 해당한다.  
+기본적으로는 `AutoHashMapAuto`라는 prefix가 붙은 것을 사용할 것으로 생각한다. 여기는 해시 함수나 key의 동치 판정을 실시하는 함수를 잘 생성해 준다.  
+반대로, 해시 함수나 key의 동치 판정을 커스터마이즈 하고 싶은 경우는 HashMap을 사용한다.  
+  
+샘플 코드  
+```
+test "AutoHashMap" {
+    var map = AutoHashMap(u32, u8).init(testing.allocator);
+    defer map.deinit();
 
-샘플 코드
-ArrayHashMap
-삽입 순서가 보관 유지되는 HashMap입니다. 삽입 순서를 유지한 채로 반복하고 싶은 경우나, 반복시의 퍼포먼스를 중시하는 경우는보다를 이용하는 것이 좋은 것 HashMap같습니다 ArrayHashMap.
-HashMap 과 마찬가지로,도 AutoArrayHashMap준비되어 있고, 기본적인 유스 케이스에서는 이쪽으로 부족할까 생각합니다.
+    try map.put(0, 'a');
+    try map.put(1, 'b');
 
-샘플 코드
-StringHashMap,StringArrayHashMap
-키가 캐릭터 라인 ( []const u8)의 경우는 이것을 이용합니다. 덧붙여 키가 되는 캐릭터 라인의 메모리를 관리하는 것은 호출측의 책임입니다. 관리하는 데이터의 라이프타임을 데이터 구조와 동일하게 하고 싶은 경우는, 다음에 소개하는 것의 BufMap이용을 검토해 주세요.
-사용법은 HashMap, ArrayHashMap와 같기 때문에 할애합니다.
+    try testing.expectEqual(@as(u8, 'a'), map.get(0).?);
+    try testing.expectEqual(@as(u8, 'b'), map.get(1).?);
+    try testing.expect(map.get(2) == null);
 
-BufMap,BufSet
-BufMap는, 키, 밸류가 함께 []const u8인 것 같은 HashMap 입니다.
-그러나 키 가치를 추가 할 때 문자열을 복사하여 라이프 타임을 내부적으로 BufMap관리하는 차이점이 있습니다 [3] .
-예를 들어, BufMap를 사용하고 있는 경우, 값의 덧쓰기가 발생할 때, 덧쓰기되는 측의 메모리 영역을 자동으로 적절히 해방해 줍니다. 또, deinit()메소드에 의해, 격납되고 있는 모든 키, 밸류의 메모리 영역이 해방됩니다.
+    const prev = try map.fetchPut(0, 'x');
+    try testing.expectEqual(@as(u32, 0), prev.?.key);
+    try testing.expectEqual(@as(u8, 'a'), prev.?.value);
+}
+```   
+  
+  
+  
+# ArrayHashMap
+삽입 순서가 보관 유지되는 `HashMap` 이다. 삽입 순서를 유지한 채로 반복하고 싶은 경우나, 반복시의 퍼포먼스를 중시하는 경우는 `HashMap` 보다 `ArrayHashMap`를 이용하는 것이 좋다.  
+`HashMap` 과 마찬가지로 `AutoArrayHashMap` 도 준비되어 있고, 기본적인 유스 케이스에서는 이쪽으로 부족할까 생각한다.  
+  
+샘플 코드  
+```
+test "AutoArrayHashMap" {
+    var map = AutoArrayHashMap(u32, u8).init(testing.allocator);
+    defer map.deinit();
 
-BufSet는 키가 []const u8, 값이 void인 것 같은 HashMap 로, 캐릭터 라인의 집합을 표현하고 싶을 때에 이용할 수 있습니다.
-메모리 관리에 대해서는 BufMap마찬가지입니다.
+    try map.put(0, 'a');
+    try map.put(1, 'b');
 
-샘플 코드
-ComptimeStringMap
+    var it = map.iterator();
+    try testing.expectEqual(@as(u8, 'a'), it.next().?.value_ptr.*);
+    try testing.expectEqual(@as(u8, 'b'), it.next().?.value_ptr.*);
+    try testing.expect(it.next() == null);
+}
+```  
+  
+   
+
+# StringHashMap, StringArrayHashMap
+key가 문자열 `([]const u8)`의 경우는 이것을 이용한다. 덧붙여 key가 되는 문자열의 메모리를 관리하는 것은 호출측 책임이다. 관리하는 데이터의 라이프타임을 데이터 구조와 동일하게 하고 싶은 경우는 다음에 소개하는 BufMap 이용을 검토하는 것이 좋다.  
+사용법은 `HashMap`, `ArrayHashMap`과 같다.  
+  
+
+
+# BufMap, BufSet
+BufMap는 key, 밸류가 함께 `[]const u8`인 `HashMap` 이다.
+그러나 key value를 추가 할 때 문자열을 복사하여 라이프 타임을 BufMap 내부적으로 관리하는 차이점이 있다  
+예를 들어, `BufMap`를 사용하고 있는 경우, 값의 덧쓰기가 발생할 때, 덧쓰기 되는 측의 메모리 영역을 자동으로 적절히 해방해 준다. 또, deinit()메소드에 의해 저장 되고 있는 모든 key, value 메모리 영역이 해방된다.  
+  
+`BufSet`는 key가 `[]const u8`, value가 `void`인 것 같은 `HashMap`으로, 문자열 집합을 표현하고 싶을 때에 이용할 수 있다.  
+메모리 관리에 대해서는 `BufMap` 과 마찬가지이다.  
+  
+샘플 코드  
+```
+test "BufMap" {
+    var bufmap = BufMap.init(testing.allocator);
+    defer bufmap.deinit();
+
+    try bufmap.put("x", "1");
+    try testing.expect(mem.eql(u8, bufmap.get("x").?, "1"));
+    try testing.expect(1 == bufmap.count());
+
+    try bufmap.put("x", "2");
+    try testing.expect(mem.eql(u8, bufmap.get("x").?, "2"));
+    try testing.expect(1 == bufmap.count());
+
+    bufmap.remove("x");
+    try testing.expect(0 == bufmap.count());
+}
+
+test "BufSet" {
+    var bufset = BufSet.init(testing.allocator);
+    defer bufset.deinit();
+
+    try bufset.insert("x");
+    try testing.expect(bufset.count() == 1);
+    try testing.expect(bufset.contains("x"));
+    bufset.remove("x");
+    try testing.expect(bufset.count() == 0);
+}
+```  
+  
+https://zenn.dev/magurotuna/articles/zig-std-collections
+
+# ComptimeStringMap
 키가 []const u8로, 컴파일시에 모든 요소가 확정하는 것 같은 Map 를 원하면,의 차례입니다 ComptimeStringMap.
 컴파일시에 전계산을 실시하는 것으로, 실행시의 lookup 처리의 최적화를 실시합니다. 구체적으로는, lookup시에, 키가 되는 캐릭터 라인의 길이가 일치하는 부분만을 탐색하게 됩니다. 예를 들어, map.get("foo")이렇게 하면 키 길이가 3인 것만 탐색합니다.
 
