@@ -32,43 +32,110 @@ test "ArrayList" {
   
 
 # MultiArrayList
-구조체를 요소로 하는 ArrayList 를 만들고 싶을 때는 의 MultiArrayList이용을 검토해 보세요. 다음과 같은 구조체가 S있을 때
-
+구조체를 요소로 하는 `ArrayList` 를 만들고 싶을 때는 `MultiArrayList` 이용을 검토해 보자.  
+아래와 같은 구조체가 `S` 가 있을 때  
+```
 const S = struct {
     a: u32,
     b: []const u8,
 };
+```  
 
-다음과 같이 S정리하여 ArrayList에 저장하는 방법이 있습니다.
-
-S をまるごとメモリの連続領域に格納
+아래와 같이 `S`를 모아서 `ArrayList` 에 저장하는 방법이 있다.   
+```
+S 를 모아서 메모리 연속 영역에 저장
 +-----------------------
 | S_1 | S_2 | S_3 | ...
 +-----------------------
-
-이것은에 ArrayList(S)해당합니다.
-반면에 다음과 같이 S각 필드를 별도의 목록으로 관리하는 방법이 있습니다. 여기가 MultiArrayList(S)에 해당합니다.
-
-フィールド a をメモリの連続領域に格納
+```  
+    
+이것은에 `ArrayList(S)` 에 해당한다.  
+반면에 아래와 같이 `S`의 각 필드를 별도의 목록으로 관리하는 방법이 있다. 여기가 `MultiArrayList(S)`에 해당한다.   
+```
+필드 a 를 메모리 연속 영역에 저장
 +-----------------------
 | a_1 | a_2 | a_3 | ...
 +-----------------------
 
-フィールド b をメモリの別の連続領域に格納
+필드 b 를 연속 영역에 저장
 +-----------------------
 | b_1 | b_2 | b_3 | ...
 +-----------------------
+```  
+  
+이와 같이 필드마다 별도의 리스트를 사용해 값을 관리하는 것으로, 메모리의 절약이나 캐쉬 이용의 효율화를 도모하는 것이입니다 `MultiArrayList` 이다.
+  
+샘플 코드  
+```
+test "MultiArrayList" {
+    const allocator = testing.allocator;
 
-이와 같이 필드마다 별도의 리스트를 사용해 값을 관리하는 것으로, 메모리의 절약 [1] 이나 캐쉬 이용의 효율화 [2] 를 도모하는 것이입니다 MultiArrayList.
+    const Foo = struct {
+        field_one: u32,
+        field_two: []const u8,
+    };
 
-샘플 코드
-SegmentedList
-ArrayList마찬가지로 빠른 랜덤 액세스와 끝에 추가 및 삭제할 수 있는 데이터 구조입니다.
-차이는, ArrayList확보한 메모리 영역이 부족해진 경우는, 다른 큰 영역을 확보해, 모든 요소를 ​​거기에 복사하는 것에 대해, 그럼, 추가 영역을 확보한 후에도, 그때까지 SegmentedList저장 되고 있던 데이터는 원래의 위치에 남는다고 하는 곳에 있습니다.
-즉, ArrayList는 모든 요소가 순서대로 메모리상에 늘어서 있는 것이 보증되고 있습니다만, 는 어느 정도의 크기의 요소의 「덩어리」마다, 다른 메모리 영역에 배치되게 됩니다 SegmentedList.
-SegmentedList의 장점은 요소를 가리키는 포인터가 생존하는 기간이 SegmentedList자체의 라이프 타임과 일치한다는 것입니다. 방금 쓴 것처럼, 그럼 ArrayList, 확보한 메모리 영역이 부족해졌을 때에 다른 영역에의 카피가 행해지기 (위해)때문에, 원의 영역을 가리키는 포인터는 이 시점에서 부정이 됩니다. 한편, SegmentedList그럼, 메모리 영역이 부족해졌을 경우에도 원의 요소의 카피는 행해지지 않기 때문에, 포인터가 부정하게 되는 일은 없습니다.
+    var list = MultiArrayList(Foo){};
+    defer list.deinit(allocator);
 
-샘플 코드
+    try testing.expectEqual(@as(usize, 0), list.items(.field_one).len);
+
+    try list.append(allocator, .{
+        .field_one = 1,
+        .field_two = "foo",
+    });
+    try list.append(allocator, .{
+        .field_one = 2,
+        .field_two = "bar",
+    });
+
+    try testing.expectEqualSlices(u32, list.items(.field_one), &[_]u32{ 1, 2 });
+
+    try testing.expectEqual(@as(usize, 2), list.items(.field_two).len);
+    try testing.expectEqualStrings("foo", list.items(.field_two)[0]);
+    try testing.expectEqualStrings("bar", list.items(.field_two)[1]);
+}
+```  
+  
+   
+# SegmentedList
+ArrayList 와 마찬가지로 빠른 랜덤 액세스와 끝에 추가 및 삭제할 수 있는 데이터 구조이다.  
+차이는 ArrayList는 확보한 메모리 영역이 부족한 경우는 다른 큰 영역을 확보하고, 모든 요소를 ​​거기에 복사하는 것에 대해, `SegmentedList`는 추가 영역을 확보한 후에도 그때까지 저장 되고 있던 데이터는 원래의 위치에 남는다는 것이다.  
+즉, ArrayList는 모든 요소가 순서대로 메모리 상에 늘어서 있는 것이 보증되고 있지만, `SegmentedList`는 어느 정도 크기 요소의 「덩어리」 마다, 다른 메모리 영역에 배치되게 된다.  
+`SegmentedList`의 장점은 요소를 가리키는 포인터가 생존하는 기간이 `SegmentedList` 자체의 라이프 타임과 일치한다는 것이다. 방금 쓴 것처럼 ArrayList에서는 확보한 메모리 영역이 부족해졌을 때에 다른 영역으로 복사가 행해지기 때문에, 원래의 영역을 가리키는 포인터는 이 시점에서 부정이 된다.  한편, `SegmentedList`는 메모리 영역이 부족해졌을 경우에도 원래 요소의 복사는 행해지지 않기 때문에, 포인터가 부정하게 되는 일은 없다.  
+  
+샘플 코드  
+```  
+test "SegmentedList" {
+    const L = SegmentedList(u32, 2);
+    var list = L{};
+    defer list.deinit(testing.allocator);
+
+    try list.append(testing.allocator, 1);
+    try list.append(testing.allocator, 2);
+    try list.append(testing.allocator, 3);
+    try testing.expectEqual(@as(usize, 3), list.count());
+
+    {
+        var it = list.iterator(0);
+        var s: u32 = 0;
+        while (it.next()) |item| {
+            s += item.*;
+        }
+        try testing.expectEqual(@as(u32, 6), s);
+    }
+
+    {
+        var it = list.constIterator(0);
+        var s: u32 = 0;
+        while (it.next()) |item| {
+            s += item.*;
+        }
+        try testing.expectEqual(@as(u32, 6), s);
+    }
+}
+```  
+  
 SinglyLinkedList
 단방향 연결 목록입니다. C++에 std::forward_list해당합니다.
 요소의 메모리, 수명 관리는 호출자의 책임입니다.
