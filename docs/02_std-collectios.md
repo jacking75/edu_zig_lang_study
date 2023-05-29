@@ -307,46 +307,247 @@ test "BufSet" {
 }
 ```  
   
-https://zenn.dev/magurotuna/articles/zig-std-collections
+
 
 # ComptimeStringMap
-키가 []const u8로, 컴파일시에 모든 요소가 확정하는 것 같은 Map 를 원하면,의 차례입니다 ComptimeStringMap.
-컴파일시에 전계산을 실시하는 것으로, 실행시의 lookup 처리의 최적화를 실시합니다. 구체적으로는, lookup시에, 키가 되는 캐릭터 라인의 길이가 일치하는 부분만을 탐색하게 됩니다. 예를 들어, map.get("foo")이렇게 하면 키 길이가 3인 것만 탐색합니다.
+key가 `[]const u8`로 컴파일시에 모든 요소를 확정하는 `Map` 같은 것을 원하는 경우에는 `ComptimeStringMap` 이다.  
+컴파일시에 전 계산을 실시하는 것으로 실행시의 lookup 처리의 최적화를 실시한다. 구체적으로는 lookup 시에 key가 되는 문자열의 길이가 일치하는 부분만을 탐색하게 된다. 예를 들어 `map.get("foo")` 이렇게 하면 key 길이가 3인 것만 탐색한다.  
+  
+샘플 코드    
+```
+test "ComptimeStringMap" {
+    const KV = struct {
+        @"0": []const u8,
+        @"1": u32,
+    };
+    const map = ComptimeStringMap(u32, [_]KV{
+        .{ .@"0" = "foo", .@"1" = 42 },
+        .{ .@"0" = "barbaz", .@"1" = 99 },
+    });
 
-샘플 코드
-BoundedArray
-정확한 사이즈는 런타임에 될 때까지 불명하지만, 최대 사이즈는 컴파일시에 알고 있다, 라고 하는 배열을 원할 때 편리한 데이터 구조입니다.
-컴파일시에 최대 사이즈분의 메모리 영역을 확보하기 위해, 할당자가 불필요합니다.
-
-아이디어는 Rust에 smallvec가깝습니다. 다만 smallvec, 사전에 확보한 배열 사이즈를 넘으면 힙 영역에 이동해 줍니다만, 는, 지정한 최대 사이즈를 넘는 요소수를 지정하면, 에러가 BoundedArray됩니다 Overflow.
-
-샘플 코드
-StaticBitSet,DynamicBitSet
-비트 집합을 나타내는 데이터 구조입니다. C++에 std::bitset해당합니다.
-컴파일시에 비트 사이즈가 결정하는 경우는 를 StaticBitSet, 런타임에 결정하는 경우 DynamicBitSet는를 이용합니다.
-비트 크기는 최적의 데이터 구조를 선택합니다. 비트 사이즈가 작은 경우는 정수를 이용해, 큰 경우는 배열이 사용됩니다.
-
-샘플 코드
-EnumArray,, EnumMap_EnumSet
-Enum 를 키 (인덱스) 로 하는 Array, Map, Set 를 원하는 경우에 편리한 데이터 구조입니다.
-
-샘플 코드
-PriorityQueue,PriorityDequeue
-우선순위가 있는 큐입니다. C++ std::priority_queue또는 Rust에 std::collections::BinaryHeap해당합니다.
-
-최대치, 혹은 최소치만을 고속으로 꺼내고 싶은 경우는 를 PriorityQueue사용해, 최대치와 최소치의 양쪽 모두를 고속으로 꺼내고 싶은 경우는를 이용 PriorityDequeue합니다.
-
-샘플 코드
-Treap
-평형 이분 탐색 나무입니다. Treap - Wikipedia
-적흑목 등 다른 평형 이분 탐색 트리가 아니라가 Treap채용되고 있는 것은, 구현의 단순함이라고 하는 것이 가장 큰 이유라는 것입니다.
-
-샘플 코드
-덤
-C++ 의 std::dequeRust 에 std::collections::VecDeque상당하는 데이터 구조는 제공되고 있지 않다는 것을 깨닫고, 흠뻑 자작해 보았습니다.
-ArrayList과 같이 랜덤 액세스와 말미에의 추가·삭제를 고속으로 실시할 수 있는 것에 더해, 선두에의 추가·삭제도 효율적으로 실시할 수 있는 데이터 구조입니다.
-
+    try testing.expectEqual(@as(u32, 42), map.get("foo").?);
+    try testing.expectEqual(@as(u32, 99), map.get("barbaz").?);
+    try testing.expect(!map.has("hello"));
+    try testing.expect(map.get("hello") == null);
+}
+```  
   
 
+
+# BoundedArray
+정확한 사이즈는 런타임에 때까지 불명하지만, 최대 사이즈는 컴파일시에 알고 있다 라고 하는 배열을 원할 때 편리한 데이터 구조이다.  
+컴파일시에 최대 사이즈분의 메모리 영역을 확보하기 때문에, 할당자가 불필요하다.  
   
+아이디어는 Rust의 `smallvec` 에 가깝다. 다만 `smallvec`는 사전에 확보한 배열 사이즈를 넘으면 힙 영역에 이동해 주지만, `BoundedArray` 는 지정한 최대 사이즈를 넘는 요소수를 지정하면 Overflow 에러가 된다.
+  
+샘플 코드    
+```
+test "BoundedArray" {
+    const BoundedArrayMax4 = BoundedArray(u8, 4);
+
+    try testing.expectError(error.Overflow, BoundedArrayMax4.init(8));
+
+    var a = try BoundedArrayMax4.init(2);
+
+    try testing.expectEqual(a.capacity(), 4);
+    try testing.expectEqual(a.len, 2);
+    try testing.expectEqual(a.slice().len, 2);
+    try testing.expectEqual(a.constSlice().len, 2);
+
+    try a.resize(4);
+    try testing.expectEqual(a.len, 4);
+
+    a.set(0, 42);
+    try testing.expectEqual(a.get(0), 42);
+}
+``` 
+  
+
+
+# StaticBitSet, DynamicBitSet
+비트 집합을 나타내는 데이터 구조이다. C++의 `std::bitset` 에 해당한다.  
+컴파일시에 비트 사이즈를 결정하는 경우는 `StaticBitSet`를, 런타임에 결정하는 경우 `DynamicBitSet`를 이용한다.  
+비트 크기는 최적의 데이터 구조를 선택한다. 비트 사이즈가 작은 경우는 정수를 이용하고, 큰 경우는 배열을 사용한다.  
+
+샘플 코드  
+```
+test "StaticBitSet" {
+    var bitset = StaticBitSet(4).initEmpty();
+
+    try testing.expectEqual(@as(usize, 0), bitset.count());
+
+    bitset.setValue(1, true);
+    try testing.expectEqual(@as(usize, 1), bitset.count());
+    try testing.expect(!bitset.isSet(0));
+    try testing.expect(bitset.isSet(1));
+
+    bitset.setRangeValue(.{ .start = 2, .end = 4 }, true);
+    try testing.expectEqual(@as(usize, 3), bitset.count());
+}
+
+test "DynamicBitSet" {
+    const size = @intCast(usize, time.timestamp()) % 60;
+
+    var bitset = try DynamicBitSet.initEmpty(std.testing.allocator, size);
+    defer bitset.deinit();
+
+    try testing.expectEqual(@as(usize, 0), bitset.count());
+
+    bitset.toggleAll();
+    try testing.expectEqual(size, bitset.count());
+}  
+```  
+  
+  
+
+# EnumArray, EnumMap, EnumSet
+Enum을 key(인덱스)로 하는 `Array`, `Map`, `Set` 을 원하는 경우에 편리한 데이터 구조이다.  
+  
+샘플 코드  
+```
+test "EnumArray" {
+    const A = EnumArray(enum {
+        foo,
+        bar,
+    }, u32);
+    try testing.expectEqual(@as(usize, 2), A.len);
+
+    var a = A.initFill(42);
+    try testing.expectEqual(@as(u32, 42), a.get(.foo));
+    try testing.expectEqual(@as(u32, 42), a.get(.bar));
+}
+
+test "EnumMap" {
+    const A = EnumMap(enum {
+        foo,
+        bar,
+    }, u32);
+
+    try testing.expectEqual(@as(usize, 2), A.len);
+
+    var a = A{};
+    try testing.expectEqual(@as(usize, 0), a.count());
+    a.put(.foo, 42);
+    try testing.expectEqual(@as(usize, 1), a.count());
+    try testing.expect(a.contains(.foo));
+    try testing.expect(!a.contains(.bar));
+}
+
+test "EnumSet" {
+    const A = EnumSet(enum {
+        foo,
+        bar,
+    });
+
+    try testing.expectEqual(@as(usize, 2), A.len);
+
+    var a = A{};
+    try testing.expectEqual(@as(usize, 0), a.count());
+    a.insert(.foo);
+    try testing.expectEqual(@as(usize, 1), a.count());
+    try testing.expect(a.contains(.foo));
+    try testing.expect(!a.contains(.bar));
+
+    a.remove(.foo);
+    try testing.expectEqual(@as(usize, 0), a.count());
+}
+```  
+  
+
+
+# PriorityQueue, PriorityDequeue
+우선순위가 있는 큐이다. C++의 `std::priority_queue` Rust의 `std::collections::BinaryHeap` 에 해당한다.  
+최대치, 혹은 최소치만을 고속으로 꺼내고 싶은 경우는 `PriorityQueue`를 사용하고, 최대치와 최소치의 양쪽 모두를 고속으로 꺼내고 싶은 경우는 `PriorityDequeue`를 이용한다.  
+  
+샘플 코드  
+```
+test "PriorityQueue" {
+    {
+        const MinHeap = PriorityQueue(u32, void, struct {
+            fn lessThan(context: void, a: u32, b: u32) math.Order {
+                _ = context;
+                return math.order(a, b);
+            }
+        }.lessThan);
+        var queue = MinHeap.init(testing.allocator, {});
+        defer queue.deinit();
+
+        try queue.add(12);
+        try queue.add(7);
+        try queue.add(23);
+        try testing.expectEqual(@as(usize, 3), queue.len);
+        try testing.expectEqual(@as(u32, 7), queue.remove());
+        try testing.expectEqual(@as(u32, 12), queue.remove());
+        try testing.expectEqual(@as(u32, 23), queue.remove());
+    }
+
+    {
+        const MaxHeap = PriorityQueue(u32, void, struct {
+            fn greaterThan(context: void, a: u32, b: u32) math.Order {
+                _ = context;
+                return math.order(a, b).invert();
+            }
+        }.greaterThan);
+        var queue = MaxHeap.init(testing.allocator, {});
+        defer queue.deinit();
+
+        try queue.add(12);
+        try queue.add(7);
+        try queue.add(23);
+        try testing.expectEqual(@as(usize, 3), queue.len);
+        try testing.expectEqual(@as(u32, 23), queue.remove());
+        try testing.expectEqual(@as(u32, 12), queue.remove());
+        try testing.expectEqual(@as(u32, 7), queue.remove());
+    }
+}
+
+test "PriorityDequeue" {
+    const PQ = PriorityDequeue(u32, void, struct {
+        fn lessThan(context: void, a: u32, b: u32) math.Order {
+            _ = context;
+            return math.order(a, b);
+        }
+    }.lessThan);
+    var queue = PQ.init(testing.allocator, {});
+    defer queue.deinit();
+
+    try queue.add(12);
+    try queue.add(7);
+    try queue.add(23);
+    try testing.expectEqual(@as(usize, 3), queue.len);
+    try testing.expectEqual(@as(u32, 7), queue.removeMin());
+    try testing.expectEqual(@as(u32, 23), queue.removeMax());
+    try testing.expectEqual(@as(u32, 12), queue.removeMin());
+}
+```
+  
+  
+
+# Treap
+평형 이분 탐색 트리이다.   
+레드-블랙 트리 등 다른 평형 이분 탐색 트리가 아닌 `Treap` 이 채용되고 있는 것은, [구현의 단순함이 가장 큰 이유라고 한다](https://github.com/ziglang/zig/pull/11444 ).  
+  
+샘플 코드  
+```
+test "Treap" {
+    const MyTreap = Treap(u32, math.order);
+    const Node = MyTreap.Node;
+    var treap = MyTreap{};
+    var nodes: [10]Node = undefined;
+
+    var i: u32 = 0;
+    while (i < 10) : (i += 1) {
+        var entry = treap.getEntryFor(i);
+        try testing.expectEqual(i, entry.key);
+        try testing.expect(entry.node == null);
+
+        entry.set(&nodes[i]);
+    }
+
+    try testing.expectEqual(@as(u32, 9), treap.getMax().?.key);
+    try testing.expectEqual(@as(u32, 0), treap.getMin().?.key);
+}
+```
+  
+    
 https://zenn.dev/magurotuna/articles/zig-std-collections
