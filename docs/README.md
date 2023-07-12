@@ -44,19 +44,38 @@
      
 
 # 학습
-- [Zig 명령어](https://docs.google.com/document/d/e/2PACX-1vRqzUjWtvFSU0hJoHyb9g1B6cD3ZN80ZEw5ftZZM8LQUzkty_6kRZIST0tYVDxfHnW1P1Q25FbGQTCa/pub )
-- [기초](.\01_basic.md)  
-- [표준 라이브러리의 컬렉션](.\02_std-collectios.md)
-- [exercises](https://github.com/ratfactor/ziglings/tree/main/exercises )
 
-## 참고  
-- https://ziglearn.org/chapter-1/
-- https://ziglang.org/documentation/0.9.1/
-- [(일어) Zig에 대해서](https://zenn.dev/hnakamur/books/memo-about-zig )
-
-- [(일어) Zig 표준 라이브러리에서 준비되어 있는 컬렉션 타입을 정리](https://zenn.dev/magurotuna/articles/zig-std-collections )
-
+## [Zig 명령어](https://docs.google.com/document/d/e/2PACX-1vRqzUjWtvFSU0hJoHyb9g1B6cD3ZN80ZEw5ftZZM8LQUzkty_6kRZIST0tYVDxfHnW1P1Q25FbGQTCa/pub )
   
+## [기초](.\01_basic.md)  
+  
+## 표준 라이브러리의 파일 디렉토리 구성
+Go의 경우 패키지가 디렉토리에 대응하는 이미지이지만, Zig은 각 패키지는 파일이다.  
+예를 들어 `std` 패키지는 `std.zig`에서 거기로부터 예를 들어 70행째에서 아래와 같이 `@import`한 결과에 `math` 라고 이름을 붙여서 pub 공개하는 것으로 `std.math` 패키지로서 접근 가능하다.  
+```
+pub const math = @import("math.zig");
+```  
+게다가 `math.zig`의 275 행에서는 아래와 같이 `math` 라는 서브 디렉토리 내의 `cos.zig`을 `@import`한 결과의 `cos` 필드에 `cos`라는 이름을 붙여서 pub으로 공개하고 있다. 이것으로 `std.math.cos`에 접근할 수 있게 되었다.  
+```
+pub const cos = @import("math/cos.zig").cos;
+```  
+  
+패키지가 작을 때는 1 파일로 구성하고, 커지면 서브디렉토리를 잘라 그 아래에 일부를 잘라내어 파일로 둔다고 하는 스타일과 같다.    
+  
+    
+## [표준 라이브러리의 컬렉션](.\02_std-collectios.md)
+  
+
+## 참고
+- [exercises](https://github.com/ratfactor/ziglings/tree/main/exercises )
+- [(일어) Zig note](https://zenn.dev/ousttrue/books/b2ec4e93bdc5c4 )
+- https://ziglearn.org/chapter-1/
+- https://ziglang.org/documentation/master/
+- https://ziglang.org/documentation/master/std
+- [(일어) Zig에 대해서](https://zenn.dev/hnakamur/books/memo-about-zig )
+- [(일어) std.ioパッケージ](https://zenn.dev/hnakamur/books/memo-about-zig/viewer/io-package )
+
+    
 <br>  
 
 
@@ -69,10 +88,15 @@
   
 ## JetBrains
 - [JetBrains Plugin - Zig Support](https://plugins.jetbrains.com/plugin/18062-zig-support/versions )
-
-<br>    
   
-    
+
+<br>        
+     
+      
+       
+
+
+
 # 응용 
 - [(일어) Zig으로 쓴 cmd 애플리케이션에 perf 사용하기](https://zenn.dev/hnakamur/articles/use-perf-to-cli-app-written-in-zig )
 - [(일어) Zig에서 출력을 버퍼링하기](https://zenn.dev/woxtu/articles/output-buffering-in-zig )
